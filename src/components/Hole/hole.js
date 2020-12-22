@@ -3,12 +3,15 @@ import React from 'react';
 import './hole.scss';
 
 
-const Hole = () => {
+const Hole = (props) => {
 
 
     return (
-    <div className="Hole">
-
+    <div className="Hole" key={props.id}>
+        {
+            props.molPos !== props.id ? null : 
+                <div className="mole" onClick={props.AddScore}></div>
+        }
     </div>);
 }
 
