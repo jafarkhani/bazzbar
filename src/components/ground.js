@@ -8,7 +8,7 @@ const Ground = (props) => {
     const interval = useRef(null);
 
     const [loading, SetLoading] = useState(false);
-    const [timer, SetTimer] = useState(20);
+    const [timer, SetTimer] = useState(10);
     const [score, SetScore] = useState(0);
     const [totalMoles, SettotalMoles] = useState(0);
     const [molePos, SetmolePos] = useState(0);
@@ -16,7 +16,6 @@ const Ground = (props) => {
 
     useEffect(()=>{
         interval.current = setInterval(()=>{
-            console.log("fdf")
             SetTimer(timer => timer-1);                       
         }, 1000);
 
@@ -31,7 +30,7 @@ const Ground = (props) => {
         clearInterval(interval.current); 
         clearTimeout(timeout.current); 
         // save the score 
-        SaveScore();
+        SaveScore();        
 
     },[timer]);
 
@@ -49,8 +48,11 @@ const Ground = (props) => {
     }
     
     useEffect(() => {
+
+        if(totalMoles === 0)
+            return;
+
         let random = Math.floor(Math.random() * 7) + 1 ; 
-        console.log(random);
         SetmolePos(random);
 
         timeout.current = setTimeout(()=>{
@@ -86,7 +88,12 @@ const Ground = (props) => {
     }
 
     if(timer === 0)
-        return <div>End Game</div>
+        return (
+            <div>
+                <h3>End Game</h3>
+                <h3>total moles : {totalMoles}</h3>
+                <h3>Your Score: {score}</h3>
+            </div>)
 
     return (
         <div align="center">
