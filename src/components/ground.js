@@ -6,6 +6,7 @@ const Ground = (props) => {
     const HoleCount = 7;
     const timeout = useRef(null);
 
+    const [loading, SetLoading] = useState(false);
     const [timer, SetTimer] = useState(60);
     const [score, SetScore] = useState(0);
     const [totalMoles, SettotalMoles] = useState(0);
@@ -14,8 +15,9 @@ const Ground = (props) => {
 
     useEffect(()=>{
         setInterval(()=>{
-            SetTimer(timer-1);                       
-        }, 60000);
+            console.log("fdf")
+            SetTimer(timer => timer-1);                       
+        }, 1000);
 
         SettotalMoles(totalMoles+1); 
 
@@ -25,10 +27,25 @@ const Ground = (props) => {
         if(timer > 0)
             return;
         
-        //-------
+         
+        clearTimeout(timeout.current ); 
+        // save the score 
+        SaveScore();
 
     },[timer]);
 
+    const SaveScore = async () => {
+
+        fetch("http://service/buzzbar-server/api/AddScore" +  new URLSearchParams({
+            Player : props.player,
+            score: score
+        })).then(response => response.json())
+        .then(result => {
+            console.log("save score")
+
+        })
+        
+    }
     
     useEffect(() => {
         let random = Math.floor(Math.random() * 7) + 1 ; 
