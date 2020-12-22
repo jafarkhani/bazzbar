@@ -5,16 +5,17 @@ const Ground = (props) => {
 
     const HoleCount = 7;
     const timeout = useRef(null);
+    const interval = useRef(null);
 
     const [loading, SetLoading] = useState(false);
-    const [timer, SetTimer] = useState(60);
+    const [timer, SetTimer] = useState(20);
     const [score, SetScore] = useState(0);
     const [totalMoles, SettotalMoles] = useState(0);
     const [molePos, SetmolePos] = useState(0);
 
 
     useEffect(()=>{
-        setInterval(()=>{
+        interval.current = setInterval(()=>{
             console.log("fdf")
             SetTimer(timer => timer-1);                       
         }, 1000);
@@ -27,8 +28,8 @@ const Ground = (props) => {
         if(timer > 0)
             return;
         
-         
-        clearTimeout(timeout.current ); 
+        clearInterval(interval.current); 
+        clearTimeout(timeout.current); 
         // save the score 
         SaveScore();
 
