@@ -37,7 +37,7 @@ const Ground = (props) => {
 
     const SaveScore = async () => {
 
-        fetch("http://service/buzzbar-server/api/AddScore" +  new URLSearchParams({
+        fetch("http://service/buzzbar-server/public/api/AddScore" +  new URLSearchParams({
             Player : props.player,
             score: score
         })).then(response => response.json())
