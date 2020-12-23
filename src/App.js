@@ -1,45 +1,63 @@
-
-
-
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import _ from 'underscore';
+
 import Ground from './components/ground';
+import ScoreList from './components/ScoreList/ScoreList';
 
 function App() {
 
-  const [player, SetPlayer] = useState(null);
+  const [player, SetPlayer] = useState({});
   const playerInput = useRef();
-  useEffect(() => {
-
-  }, [])
 
   const StartGame = () => {
 
-    SetPlayer(playerInput.current.value);
+    SetPlayer({
+      name: playerInput.current.value,
+      totalMoles: 0,
+      score: 0,
+      playing: true
+    });
   }
 
   const NewGame = () => {
-
-    SetPlayer(null);
+    
+    SetPlayer({
+      ...player,
+      totalMoles: 0,
+      score: 0,
+      playing: true
+    });
 
   }
 
-  if (player == null)
+  if (_.isEmpty(player))
     return (
       <div>
         Type your name :
         <input type="text" name="player" id="player" ref={playerInput} />
         <button onClick={StartGame}>Enter the game</button>
+        <ScoreList />
+      </div>
+    );
+
+  if (player.playing)
+    return (
+      <div align="center">
+        <Ground
+          player={player}
+          SaveScore={SetPlayer}
+        />
       </div>
     );
 
   return (
-        <div align="center">
-          <Ground player={player} />
-          <button onClick={NewGame}>StartNewGame</button>
-        </div>
-    
-
-    
+    <div>
+      <h3>End Game</h3>
+      <h3>total moles : {player.totalMoles}</h3>
+      <h3>Your Score: {player.score}</h3>
+      <button onClick={NewGame}>Retry</button>
+      <ScoreList />
+    </div>
   );
 }
 

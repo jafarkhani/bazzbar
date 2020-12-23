@@ -8,99 +8,108 @@ const Ground = (props) => {
     const interval = useRef(null);
 
     const [loading, SetLoading] = useState(false);
-    const [timer, SetTimer] = useState(10);
-    const [score, SetScore] = useState(0);
+    const [timer, SetTimer] = useState(3);
+    const [hits, Sethits] = useState(0);
     const [totalMoles, SettotalMoles] = useState(0);
     const [molePos, SetmolePos] = useState(0);
 
 
-    useEffect(()=>{
-        interval.current = setInterval(()=>{
-            SetTimer(timer => timer-1);                       
+    useEffect(() => {
+        interval.current = setInterval(() => {
+            SetTimer(timer => timer - 1);
         }, 1000);
 
-        SettotalMoles(totalMoles+1); 
+        SettotalMoles(totalMoles + 1);
 
     }, [props.player]);
 
-    useEffect(()=>{
-        if(timer > 0)
+    useEffect(() => {
+        if (timer > 0)
             return;
-        
-        clearInterval(interval.current); 
-        clearTimeout(timeout.current); 
-        // save the score 
-        SaveScore();        
 
-    },[timer]);
+        clearInterval(interval.current);
+        clearTimeout(timeout.current);
+        // save the hits 
+        SaveScore();
+
+    }, [timer]);
+
+    function ComputScore(hits, total){
+        return Math.round((hits/total)*100);
+    }
 
     const SaveScore = async () => {
 
-        fetch("http://service/buzzbar-server/public/api/AddScore" +  new URLSearchParams({
-            Player : props.player,
-            score: score
-        })).then(response => response.json())
-        .then(result => {
-            console.log("save score")
+        SetLoading(true);
+        fetch("http://service/buzzbar-server/public/api/AddScore?" + new URLSearchParams({
+            name: props.player.name,
+            total: totalMoles,
+            hits: hits,
+            score: ComputScore(hits,totalMoles)
 
-        })
-        
+        })).then(response => response.json())
+            .then(result => {
+                SetLoading(false);
+                props.SaveScore({
+                    ...props.player,
+                    playing: false,
+                    hits: hits,
+                    score: ComputScore(hits,totalMoles),
+                    totalMoles: totalMoles
+                })
+            })
     }
-    
+
     useEffect(() => {
 
-        if(totalMoles === 0)
+        if (totalMoles === 0)
             return;
 
-        let random = Math.floor(Math.random() * 7) + 1 ; 
+        let random;
+        while(true){
+            random = Math.floor(Math.random() * 7) + 1;
+            if(random !== molePos)
+                break;
+        }
         SetmolePos(random);
 
-        timeout.current = setTimeout(()=>{
+        timeout.current = setTimeout(() => {
             console.log("timeout")
-            FailScore();
-        },2000);
+            SettotalMoles(totalMoles + 1);
+        }, 1000);
 
-    },[totalMoles]);
+    }, [totalMoles]);
 
-    const AddScore = () => {
-        SetScore(score+1);           
-        clearTimeout(timeout.current );     
-        SettotalMoles(totalMoles+1);
+    const Addhit = () => {
+        Sethits(hits + 1);
+        clearTimeout(timeout.current);
+        SettotalMoles(totalMoles + 1);
     }
-
-    const FailScore = () => {
-        
-        SettotalMoles(totalMoles+1);        
-    }
-
 
     let holes = [];
     for (let i = 1; i <= HoleCount; i++) {
-        holes.push(<Hole 
+        holes.push(<Hole
             key={i}
-            id={i} 
+            id={i}
             totalMoles={totalMoles}
-            score={score}
+            hits={hits}
             molPos={molePos}
-            AddScore={AddScore}
-            FailScore={FailScore}
-            />);
+            Addhit={Addhit}
+        />);
     }
 
-    if(timer === 0)
+    if (loading)
         return (
-            <div>
-                <h3>End Game</h3>
-                <h3>total moles : {totalMoles}</h3>
-                <h3>Your Score: {score}</h3>
-            </div>)
+            <div>Save hits ....</div>
+        );
 
     return (
         <div align="center">
-            <h3>Player: {props.player} </h3>      
-            <h3>Play Time remain: {timer} </h3>            
-            <h3>Total Moles: {totalMoles} </h3>            
-            <h3>Your Score: {score} </h3>
+            <h3>Player: {props.player.name} </h3>
+            <h3>Play Time remain: {timer} </h3>
+            <h3>Total Moles: {props.player.totalMoles} </h3>
+            <h3>Your hits: {props.player.hits} </h3>
+            <h3>Your score: {props.player.score} </h3>
             {holes}
         </div>);
 }
