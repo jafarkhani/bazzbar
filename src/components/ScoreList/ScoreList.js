@@ -7,10 +7,10 @@ const ScoreList = (props) => {
 
     useEffect(() => {
         const fetchScores = async () => {
-            const response = await fetch("http://service/buzzbar-server/public/api/GetScores");
+            const response = await fetch("http://localhost:5000/GetScores");
             const result = await response.json();
         
-            SetScores(result.result);
+            SetScores(result);
         }    
         fetchScores();
     }, [])
