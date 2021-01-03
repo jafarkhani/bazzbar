@@ -1,4 +1,6 @@
 # buzzbar code challenge
+The server APIs have been developed by nodejs and express.
+
 
 ## Run instruction
 
